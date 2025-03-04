@@ -25,7 +25,7 @@ class DbInteraction:
         );""")
         self.cur.execute("""CREATE TABLE authors(
         id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL
+        name TEXT UNIQUE NOT NULL
         );""")
         self.cur.execute("""CREATE TABLE books(
         id SERIAL PRIMARY KEY,
@@ -40,6 +40,51 @@ class DbInteraction:
         );""")
         self.conn.commit()
 
+    def add_book(self, lib_id, name, genre, author_names):
+        self.cur.execute("INSERT INTO books (lib_id, name, genre) VALUES (%s, %s, %s) RETURNING id;",(lib_id, name, genre))
+        book_id = self.cur.fetchone()[0]
+        for auth_name in author_names:
+            author = self.get_author(name=auth_name)
+            if author is None:
+                self.add_author(auth_name)
+                author = self.get_author(name=auth_name)
+            author_id = author[0]
+            self.cur.execute(
+                "INSERT INTO auth_to_book (book_id, auth_id) VALUES (%s, %s);",
+                (book_id, author_id)
+            )
+        self.conn.commit()
+        return book_id
+
+    def get_book(self, id):
+        self.cur.execute("SELECT * FROM books WHERE id =  %s;", (id,))
+        book = self.cur.fetchone()
+        return book
+
+    def add_author(self, name):
+        self.cur.execute("INSERT INTO authors (name) VALUES (%s) RETURNING id;", (name,))
+        auth_id = self.cur.fetchone()[0]
+        self.conn.commit()
+        return auth_id is not None
+
+    def get_author(self, id=None, name=None):
+        if id is not None:
+            self.cur.execute("SELECT id, name FROM authors WHERE id = %s;", (id,))
+        elif name is not None:
+            self.cur.execute("SELECT id, name FROM authors WHERE name = %s;", (name,))
+        author = self.cur.fetchone()
+        return author
+
+    def add_library(self, name, address):
+        self.cur.execute("INSERT INTO libraries (name, address) VALUES (%s, %s) RETURNING id;", (name, address))
+        library_id = self.cur.fetchone()[0]
+        self.conn.commit()
+        return library_id is not None
+
+    def get_library(self, id):
+        self.cur.execute("SELECT * FROM libraries WHERE id = %s;", (id,))
+        library = self.cur.fetchone()
+        return library
 
     def close(self):
         self.cur.close()
