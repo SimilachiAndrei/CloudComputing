@@ -1,6 +1,14 @@
 from http.server import BaseHTTPRequestHandler
+from librarydao import LibraryDAO
+from authordao import  AuthorDAO
+from bookdao import BookDAO
 
 class HttpHandler(BaseHTTPRequestHandler):
+
+    def __init__(self, db):
+        self.libdao = LibraryDAO(db)
+        self.authdao = AuthorDAO(db)
+        self.bookdao = BookDAO(db)
     def do_GET(self):
         if self.path == "/":
             self.respond(200, b"Hello")

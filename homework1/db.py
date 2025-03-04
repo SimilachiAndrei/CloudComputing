@@ -11,10 +11,10 @@ class DbInteraction:
         self.cur = self.conn.cursor()
 
     def drop_all(self):
-        self.cur.execute("""DROP TABLE libraries;""")
+        self.cur.execute("""DROP TABLE auth_to_book""")
         self.cur.execute("""DROP TABLE authors;""")
         self.cur.execute("""DROP TABLE books""")
-        self.cur.execute("""DROP TABLE auth_to_book""")
+        self.cur.execute("""DROP TABLE libraries;""")
         self.conn.commit()
 
     def create(self):
