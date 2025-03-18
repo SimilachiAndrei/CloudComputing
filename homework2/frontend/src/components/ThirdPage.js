@@ -3,8 +3,8 @@ function ThirdPage() {
 
     return (
         <div>
-            <h1>Welcome to the Main Page</h1>
-            <p>This is your main landing page.</p>
+            <h1>Welcome to the Third Page</h1>
+            <p>This is the page where you can access the third API.</p>
         </div>
     );
 }
