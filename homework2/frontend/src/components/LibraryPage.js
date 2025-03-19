@@ -1,28 +1,26 @@
 import { useState } from "react";
 
-
 function LibraryPage() {
-
-    const [libraries, setLibraries] = useState([])
-    const [authors, setAuthors] = useState([])
-    const [books, setBooks] = useState([])
+    const [libraries, setLibraries] = useState([]);
+    const [authors, setAuthors] = useState([]);
+    const [books, setBooks] = useState([]);
     const [singleItem, setSingleItem] = useState(null);
-
+    const [postData, setPostData] = useState({});
     const [resourceName, setResourceName] = useState("");
     const [resourceId, setResourceId] = useState("");
-
+    const [selectedResource, setSelectedResource] = useState("libraries");
 
     const fetchAll = async (resource) => {
         try {
             const response = await fetch(`http://localhost:5000/${resource}`);
             const data = await response.json();
-            if (resource == "libraries") setLibraries(data);
-            else if (resource == "books") setBooks(data)
-            else setAuthors(data)
+            if (resource === "libraries") setLibraries(data);
+            else if (resource === "books") setBooks(data);
+            else setAuthors(data);
         } catch (error) {
-            console.error("Error fetching books:", error);
+            console.error(`Error fetching ${resource}:`, error);
         }
-    }
+    };
 
     const fetchOne = async (e) => {
         e.preventDefault();
@@ -39,59 +37,65 @@ function LibraryPage() {
         }
     };
 
+    const fetchPost = async (e) => {
+        e.preventDefault();
+    
+        if (Object.keys(postData).length === 0) {
+            alert("Please enter data to be posted!");
+            return;
+        }
+    
+        try {
+            const response = await fetch(`http://localhost:5000/${selectedResource}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(postData),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            alert(`${selectedResource} posted successfully!`);
+            console.log("Success:", data);
+        } catch (error) {
+            console.error("Error posting data:", error);
+            alert("Failed to post data.");
+        }
+    };
+    
 
     return (
         <div>
             <h1>Welcome to the Library Page</h1>
-            <p>This is the page where you can access the library API.</p>
-            <button onClick={() => fetchAll("libraries")}>
-                Fetch Libraries
-            </button>
+            <p>Access the library API here.</p>
 
-            {libraries.map((library, index) => (
-                <ul key={`library-${library.id || index}`}>
-                    {library.name}:
-                    <li key={`library-id-${library.id || index}`}>
-                        ID: {library.id}
-                    </li>
-                    <li key={`library-address-${library.id || index}`}>
-                        Address: {library.address}
-                    </li>
+            <button onClick={() => fetchAll("libraries")}>Fetch Libraries</button>
+            <button onClick={() => fetchAll("authors")}>Fetch Authors</button>
+            <button onClick={() => fetchAll("books")}>Fetch Books</button>
+
+            {libraries.map((library) => (
+                <ul key={library.id}>
+                    <li><strong>{library.name}</strong></li>
+                    <li>ID: {library.id}</li>
+                    <li>Address: {library.address}</li>
                 </ul>
             ))}
 
-            <br></br>
-            <button onClick={() => fetchAll("authors")}>
-                Fetch Authors
-            </button>
-            {authors.map((author, index) => (
-                <ul key={`author-${author.id || index}`}>
-                    {author.name}:
-                    <li key={`author-id-${author.id || index}`}>
-                        ID: {author.id}
-                    </li>
+            {authors.map((author) => (
+                <ul key={author.id}>
+                    <li><strong>{author.name}</strong></li>
+                    <li>ID: {author.id}</li>
                 </ul>
             ))}
 
-
-            <button onClick={() => fetchAll("books")}>
-                Fetch Books
-            </button>
-            {books.map((book, index) => (
-                <ul key={`book-${book.id || index}`}>
-                    {book.name}:
-                    <li key={`book-id-${book.id || index}`}>
-                        ID: {book.id}
-                    </li>
-                    <li key={`book-lib_id-${book.lib_id || index}`}>
-                        LIB_ID: {book.lib_id}
-                    </li>
-                    <li key={`book-genre-${book.id || index}`}>
-                        Genre: {book.genre}
-                    </li>
-                    <li key={`book-authors-${book.id || index}`}>
-                        Authors: {book.authors}
-                    </li>
+            {books.map((book) => (
+                <ul key={book.id}>
+                    <li><strong>{book.name}</strong></li>
+                    <li>ID: {book.id}</li>
+                    <li>Genre: {book.genre}</li>
+                    <li>Authors: {book.authors?.join(", ")}</li>
                 </ul>
             ))}
 
@@ -119,8 +123,55 @@ function LibraryPage() {
                 </div>
             )}
 
+            <h2>Post a Specific Resource</h2>
+            <div>
+                <label>
+                    <input type="radio" name="resource" value="libraries" checked={selectedResource === "libraries"} onChange={(e) => setSelectedResource(e.target.value)} />
+                    Libraries
+                </label>
+                <label>
+                    <input type="radio" name="resource" value="authors" checked={selectedResource === "authors"} onChange={(e) => setSelectedResource(e.target.value)} />
+                    Authors
+                </label>
+                <label>
+                    <input type="radio" name="resource" value="books" checked={selectedResource === "books"} onChange={(e) => setSelectedResource(e.target.value)} />
+                    Books
+                </label>
+            </div>
+
+            <form onSubmit={fetchPost}>
+                {selectedResource === "libraries" && (
+                    <>
+                        <input type="text" name="name" placeholder="Library Name" onChange={(e) => setPostData({ ...postData, name: e.target.value })} required />
+                        <input type="text" name="address" placeholder="Library Address" onChange={(e) => setPostData({ ...postData, address: e.target.value })} required />
+                    </>
+                )}
+
+                {selectedResource === "authors" && (
+                    <>
+                        <input type="text" name="name" placeholder="Author Name" onChange={(e) => setPostData({ ...postData, name: e.target.value })} required />
+                    </>
+                )}
+
+                {selectedResource === "books" && (
+                    <>
+                        <input type="text" name="lib_id" placeholder="Library Id"
+                            onChange={(e) => setPostData({ ...postData, lib_id: e.target.value })} required />
+
+                        <input type="text" name="name" placeholder="Book Name"
+                            onChange={(e) => setPostData({ ...postData, name: e.target.value })} required />
+
+                        <input type="text" name="genre" placeholder="Book Genre"
+                            onChange={(e) => setPostData({ ...postData, genre: e.target.value })} required />
+
+                        <input type="text" name="author_names" placeholder="Book Authors (comma-separated)"
+                            onChange={(e) => setPostData({ ...postData, author_names: e.target.value.split(",") })} required />
+                    </>
+                )}
 
 
+                <button type="submit">Submit</button>
+            </form>
         </div>
     );
 }
