@@ -6,6 +6,8 @@ function LibraryPage() {
     const [books, setBooks] = useState([]);
     const [singleItem, setSingleItem] = useState(null);
     const [postData, setPostData] = useState({});
+    const [putData, setPutData] = useState({});
+    const [deleteData, setDeleteData] = useState({})
     const [resourceName, setResourceName] = useState("");
     const [resourceId, setResourceId] = useState("");
     const [selectedResource, setSelectedResource] = useState("libraries");
@@ -39,29 +41,83 @@ function LibraryPage() {
 
     const fetchPost = async (e) => {
         e.preventDefault();
-    
+
         if (Object.keys(postData).length === 0) {
             alert("Please enter data to be posted!");
             return;
         }
-    
+
         try {
             const response = await fetch(`http://localhost:5000/${selectedResource}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(postData),
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
+
             const data = await response.json();
             alert(`${selectedResource} posted successfully!`);
             console.log("Success:", data);
         } catch (error) {
             console.error("Error posting data:", error);
             alert("Failed to post data.");
+        }
+    };
+
+    const fetchPut = async (e) => {
+        e.preventDefault();
+
+        if (Object.keys(postData).length === 0) {
+            alert("Please enter data to be posted!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/${selectedResource}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(putData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            alert(`${selectedResource} posted successfully!`);
+            console.log("Success:", data);
+        } catch (error) {
+            console.error("Error posting data:", error);
+            alert("Failed to post data.");
+        }
+    };
+
+    const fetchDelete = async (e) => {
+        e.preventDefault();
+    
+        if (!deleteData.id) {
+            alert("Please enter a valid ID to delete!");
+            return;
+        }
+    
+        try {
+            const response = await fetch(`http://localhost:5000/${selectedResource}/${deleteData.id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" }
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            alert(`${selectedResource} with ID ${deleteData.id} deleted successfully!`);
+            console.log("Deleted successfully");            
+        } catch (error) {
+            console.error("Error deleting data:", error);
+            alert("Failed to delete data.");
         }
     };
     
@@ -170,7 +226,28 @@ function LibraryPage() {
                 )}
 
 
-                <button type="submit">Submit</button>
+                <button type="submit">Post</button>
+            </form>
+            <form onSubmit={fetchDelete}>
+                {selectedResource === "libraries" && (
+                    <>
+                        <input type="text" name="id" placeholder="Library ID" onChange={(e) => setDeleteData({ ...deleteData, id: e.target.value })} required />
+                    </>
+                )}
+
+                {selectedResource === "authors" && (
+                    <>
+                        <input type="text" name="id" placeholder="Author ID" onChange={(e) => setDeleteData({ ...deleteData, id: e.target.value })} required />
+                    </>
+                )}
+
+                {selectedResource === "books" && (
+                    <>
+                        <input type="text" name="id" placeholder="Books ID"
+                            onChange={(e) => setDeleteData({ ...deleteData, id: e.target.value })} required />
+                    </>
+                )}
+                <button type="submit">Delete</button>
             </form>
         </div>
     );

@@ -66,8 +66,8 @@ server.get('/libraries/:id', async (req, res) => {
         res.json(response.data)
     }
     catch (error) {
-        console.error('Error fetching book:', error);
-        res.status(404).json({ error: 'Book not found' });
+        console.error('Error fetching library:', error);
+        res.status(404).json({ error: 'Library not found' });
     }
 })
 
@@ -136,6 +136,40 @@ server.post('/books', async (req, res) => {
         }
     }
 });
+
+server.delete('/books/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`http://localhost:4000/books/${req.params.id}`);
+        res.json(response.data);
+    }
+    catch (error) {
+        console.error('Error deleting book:', error);
+        res.status(404).json({ error: 'Book not found' });
+    }
+})
+
+server.delete('/libraries/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`http://localhost:4000/libraries/${req.params.id}`);
+        res.json(response.data);
+    }
+    catch (error) {
+        console.error('Error deleting library:', error);
+        res.status(404).json({ error: 'Library not found' });
+    }
+})
+
+server.delete('/authors/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`http://localhost:4000/authors/${req.params.id}`);
+        res.json(response.data);
+    }
+    catch (error) {
+        console.error('Error deleting author', error);
+        res.status(404).json({ error: 'Author not found' });
+    }
+})
+
 
 
 server.listen(port, () => {
