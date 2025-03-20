@@ -170,6 +170,62 @@ server.delete('/authors/:id', async (req, res) => {
     }
 })
 
+server.put('/authors/:id', async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name) {
+            return res.status(400).json({ error: "Name is required" });
+        }
+
+        const response = await axios.put(`http://localhost:4000/authors/${req.params.id}`, { name });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error updating author:", error);
+        if (error.response) {
+            res.status(error.response.status).json(error.response.data);
+        } else {
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+});
+
+server.put('/books/:id', async (req, res) => {
+    try {
+        const { name, genre } = req.body;
+        if (!name || !genre) {
+            return res.status(400).json({ error: "Both name and genre are required" });
+        }
+
+        const response = await axios.put(`http://localhost:4000/books/${req.params.id}`, { name, genre });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error updating book:", error);
+        if (error.response) {
+            res.status(error.response.status).json(error.response.data);
+        } else {
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+});
+
+server.put('/libraries/:id', async (req, res) => {
+    try {
+        const { name, address } = req.body;
+        if (!name || !address) {
+            return res.status(400).json({ error: "Both name and address are required" });
+        }
+
+        const response = await axios.put(`http://localhost:4000/libraries/${req.params.id}`, { name, address });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error updating library:", error);
+        if (error.response) {
+            res.status(error.response.status).json(error.response.data);
+        } else {
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+});
 
 
 server.listen(port, () => {

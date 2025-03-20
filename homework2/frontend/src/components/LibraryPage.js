@@ -69,31 +69,32 @@ function LibraryPage() {
 
     const fetchPut = async (e) => {
         e.preventDefault();
-
-        if (Object.keys(postData).length === 0) {
-            alert("Please enter data to be posted!");
+    
+        if (!putData.id || Object.keys(putData).length === 1) {
+            alert("Please enter data to be updated!");
             return;
         }
-
+    
         try {
-            const response = await fetch(`http://localhost:5000/${selectedResource}`, {
+            const response = await fetch(`http://localhost:5000/${selectedResource}/${putData.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(putData),
             });
-
+    
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-
+    
             const data = await response.json();
-            alert(`${selectedResource} posted successfully!`);
+            alert(`${selectedResource} updated successfully!`);
             console.log("Success:", data);
         } catch (error) {
-            console.error("Error posting data:", error);
-            alert("Failed to post data.");
+            console.error("Error updating data:", error);
+            alert("Failed to update data.");
         }
     };
+    
 
     const fetchDelete = async (e) => {
         e.preventDefault();
@@ -249,6 +250,35 @@ function LibraryPage() {
                 )}
                 <button type="submit">Delete</button>
             </form>
+            <form onSubmit={fetchPut}>
+                {selectedResource === "libraries" && (
+                    <>
+                        <input type="text" name="id" placeholder="Library ID" onChange={(e) => setPutData({ ...putData, id: e.target.value })} required />
+                        <input type="text" name="name" placeholder="Library Name" onChange={(e) => setPutData({ ...putData, name: e.target.value })} required />
+                        <input type="text" name="address" placeholder="Library Address" onChange={(e) => setPutData({ ...putData, address: e.target.value })} required />
+
+                    </>
+                )}
+
+                {selectedResource === "authors" && (
+                    <>
+                        <input type="text" name="id" placeholder="Author ID" onChange={(e) => setPutData({ ...putData, id: e.target.value })} required />
+                        <input type="text" name="name" placeholder="Authors Name" onChange={(e) => setPutData({ ...putData, name: e.target.value })} required />
+                    </>
+                )}
+
+                {selectedResource === "books" && (
+                    <>
+                        <input type="text" name="id" placeholder="Book ID" onChange={(e) => setPutData({ ...putData, id: e.target.value })} required />
+                        <input type="text" name="name" placeholder="Book Name" onChange={(e) => setPutData({ ...putData, name: e.target.value })} required />
+                        <input type="text" name="genre" placeholder="Book Genre" onChange={(e) => setPutData({ ...putData, genre: e.target.value })} required />
+
+                    </>
+                )}
+                <button type="submit">Put</button>
+            </form>
+
+            
         </div>
     );
 }
