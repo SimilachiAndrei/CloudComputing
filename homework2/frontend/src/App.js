@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainPage from "./components/MainPage";
 import LibraryPage from "./components/LibraryPage";
-import SecondPage from "./components/SecondPage";
-import ThirdPage from "./components/ThirdPage";
+import OtherWsPage from "./components/OtherWsPage";
 
 
 function App() {
@@ -11,8 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/libraryAPI" element={<LibraryPage />} />
-        <Route path="/secondAPI" element={<SecondPage />} />
-        <Route path="/thirdAPI" element={<ThirdPage />} />
+        <Route path="/OtherWsPage" element={<OtherWsPage />} />
       </Routes>
     </Router>
   );

@@ -227,6 +227,38 @@ server.put('/libraries/:id', async (req, res) => {
     }
 });
 
+server.get("/bookinfo/:isbn", async (req, res) => {
+    try {
+        const isbn = req.params.isbn;
+        const response = await axios.get(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+
+        const bookData = response.data[`ISBN:${isbn}`];
+        if (!bookData) {
+            return res.status(404).json({ error: "Book not found" });
+        }
+
+        res.json({
+            title: bookData.title,
+            authors: bookData.authors ? bookData.authors.map(a => a.name) : [],
+            description: bookData.excerpts ? bookData.excerpts[0].text : "No description available"
+        });
+    } catch (error) {
+        console.error("Error fetching book info:", error);
+        res.status(500).json({ error: "Failed to fetch book information" });
+    }
+});
+
+server.get("/weather/:city", async (req, res) => {
+    try {
+        const city = req.params.city;
+        const response = await axios.get(`https://wttr.in/${city}?format=%C+%t`);
+        
+        res.json({ city, weather: response.data });
+    } catch (error) {
+        console.error("Error fetching weather data:", error);
+        res.status(500).json({ error: "Failed to fetch weather information" });
+    }
+});
 
 server.listen(port, () => {
     console.log(`Server running on port ${port}`);

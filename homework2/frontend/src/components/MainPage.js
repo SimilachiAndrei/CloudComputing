@@ -8,8 +8,7 @@ function MainPage() {
             <p>This is your main landing page.</p>
             <div className="link-container">
                 <Link to="/libraryAPI">Go to the Library API</Link>
-                <Link to="/secondAPI">Go to the Second API</Link>
-                <Link to="/thirdAPI">Go to the Third API</Link>
+                <Link to="/OtherWsPage">Go to the Second API</Link>
             </div>
         </div>
     );
